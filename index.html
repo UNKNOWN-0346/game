@@ -73,7 +73,7 @@
 
 <body>
     <h1>Emoji Matching Game</h1>
-    <p>Moves left: <span id="moves">10</span></p>
+    <p>Moves left: <span id="moves">20</span></p>
     <div class="game-container" id="gameBoard"></div>
     <button class="btn" onclick="resetGame()">Reset Game</button>
 
@@ -87,7 +87,7 @@
         let firstCard = null;
         let secondCard = null;
         let lockBoard = false;
-        let moves = 10;
+        let moves = 20;
         let matches = 0;
 
         function shuffleImages() {
@@ -150,7 +150,7 @@
         }
 
         function resetGame() {
-            moves = 10;
+            moves = 20;
             matches = 0;
             document.getElementById('moves').textContent = moves;
             firstCard = null;
