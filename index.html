@@ -18,15 +18,13 @@
         }
 
         .game-container {
-            height: 100%;
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             justify-content: center;
             align-items: center;
-            margin-top: 50px;
+            margin-top: 20px;
             max-width: 500px;
-            margin: 40px auto;
         }
 
         .card {
@@ -34,15 +32,15 @@
             height: 100px;
             background-color: #ffffff;
             display: flex;
-            flex-wrap: wrap;
             justify-content: center;
             align-items: center;
             cursor: pointer;
             border-radius: 5px;
             position: relative;
             border: 3px solid transparent;
-            transition: 0.8s;
-
+            transition: 0.3s;
+            font-size: 24px;
+            font-weight: bold;
         }
 
         .card img {
@@ -51,65 +49,117 @@
             position: absolute;
             display: none;
         }
-        .card:active{
+
+        .card:active {
             border: 3px solid tomato;
+        }
+
+        .btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: tomato;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: darkred;
         }
     </style>
 </head>
 
 <body>
     <h1>Emoji Matching Game</h1>
-    <div class="game-container" id="gameBoard">
+    <p>Moves left: <span id="moves">10</span></p>
+    <div class="game-container" id="gameBoard"></div>
+    <button class="btn" onclick="resetGame()">Reset Game</button>
 
-    </div>
     <script>
-        const images = ['images/angry.png', 'images/angry.png', 'images/confused.png', 'images/confused.png', 'images/loveEyes.png', 'images/loveEyes.png', 'images/sad.png','images/sad.png', 'images/smile.png', 'images/smile.png','images/cry.png','images/cry.png'];
-        // const images = ['images/angry.png', 'images/angry.png', 'images/confused.png', 'images/confused.png', 'images/loveEyes.png', 'images/loveEyes.png', 'images/sad.png','images/sad.png', 'images/smile.png', 'images/smile.png','images/cry.png','images/cry.png'];
+        let images = [
+            'images/angry.png', 'images/angry.png', 'images/confused.png', 'images/confused.png',
+            'images/loveEyes.png', 'images/loveEyes.png', 'images/sad.png', 'images/sad.png',
+            'images/smile.png', 'images/smile.png', 'images/cry.png', 'images/cry.png'
+        ];
 
-        images.sort(() => 0.5 - Math.random());
-
-        const gameBoard = document.getElementById('gameBoard');
         let firstCard = null;
         let secondCard = null;
         let lockBoard = false;
+        let moves = 10;
+        let matches = 0;
 
-        images.forEach(imageSrc => {
-            const card = document.createElement('div');
-            card.classList.add('card', 'hidden');
-            card.textContent = "❓"; 
+        function shuffleImages() {
+            images.sort(() => 0.5 - Math.random());
+        }
 
-            const img = document.createElement('img');
-            img.src = imageSrc;
-            card.appendChild(img);
+        function createBoard() {
+            const gameBoard = document.getElementById('gameBoard');
+            gameBoard.innerHTML = "";
+            shuffleImages();
 
-            card.addEventListener('click', () => {
-                if (lockBoard || card === firstCard) return;
-                img.style.display = 'block';
+            images.forEach(imageSrc => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.textContent = "❓";
 
-                if (!firstCard) {
-                    firstCard = card;
-                } else {
-                    secondCard = card;
-                    lockBoard = true;
+                const img = document.createElement('img');
+                img.src = imageSrc;
+                card.appendChild(img);
 
-                    if (firstCard.children[0].src === secondCard.children[0].src) {
-                        firstCard = null;
-                        secondCard = null;
-                        lockBoard = false;
+                card.addEventListener('click', () => {
+                    if (lockBoard || card === firstCard || img.style.display === 'block') return;
+                    img.style.display = 'block';
+
+                    if (!firstCard) {
+                        firstCard = card;
                     } else {
-                        setTimeout(() => {
-                            firstCard.children[0].style.display = 'none';
-                            secondCard.children[0].style.display = 'none';
+                        secondCard = card;
+                        lockBoard = true;
+                        moves--;
+                        document.getElementById('moves').textContent = moves;
+
+                        if (firstCard.children[0].src === secondCard.children[0].src) {
+                            matches++;
                             firstCard = null;
                             secondCard = null;
                             lockBoard = false;
-                        }, 1000);
-                    }
-                }
-            });
+                            if (matches === images.length / 2) {
+                                setTimeout(() => alert("🎉 You won!"), 300);
+                            }
+                        } else {
+                            setTimeout(() => {
+                                firstCard.children[0].style.display = 'none';
+                                secondCard.children[0].style.display = 'none';
+                                firstCard = null;
+                                secondCard = null;
+                                lockBoard = false;
+                            }, 1000);
+                        }
 
-            gameBoard.appendChild(card);
-        });
+                        if (moves === 0) {
+                            setTimeout(() => alert("❌ Game Over! You ran out of moves."), 300);
+                            resetGame();
+                        }
+                    }
+                });
+
+                gameBoard.appendChild(card);
+            });
+        }
+
+        function resetGame() {
+            moves = 10;
+            matches = 0;
+            document.getElementById('moves').textContent = moves;
+            firstCard = null;
+            secondCard = null;
+            lockBoard = false;
+            createBoard();
+        }
+
+        createBoard();
     </script>
 </body>
 
